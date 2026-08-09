@@ -62,10 +62,14 @@ jobs:
           MIX_PUSHER_APP_KEY=
           MIX_PUSHER_APP_CLUSTER=
           EOF
-
           sed -i 's/^[[:space:]]*//' core/.env
-          echo "=== .env preview (first 12 lines) ==="
-          head -12 core/.env
+
+      - name: Fix Storage Permissions
+        run: |
+          chmod -R 775 core/storage
+          chmod -R 775 core/bootstrap/cache
+          find core/storage -type d -exec chmod 775 {} \;
+          find core/bootstrap/cache -type d -exec chmod 775 {} \;
 
       - name: Upload via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
