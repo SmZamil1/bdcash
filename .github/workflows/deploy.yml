@@ -64,12 +64,16 @@ jobs:
           EOF
           sed -i 's/^[[:space:]]*//' core/.env
 
-      - name: Fix Storage Permissions
+      - name: Set permissions on storage folders before upload
         run: |
-          chmod -R 775 core/storage
-          chmod -R 775 core/bootstrap/cache
-          find core/storage -type d -exec chmod 775 {} \;
-          find core/bootstrap/cache -type d -exec chmod 775 {} \;
+          chmod -R 775 core/storage || true
+          chmod -R 775 core/bootstrap/cache || true
+          find core/storage -type d | xargs chmod 775
+          find core/bootstrap/cache -type d | xargs chmod 775
+          find core/storage -type f | xargs chmod 664
+          find core/bootstrap/cache -type f | xargs chmod 664
+          ls -la core/storage/
+          ls -la core/bootstrap/
 
       - name: Upload via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
