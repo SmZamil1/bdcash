@@ -1,0 +1,8 @@
+<?php
+$filename = "example.txt";
+$content = "Hello! This is a text file created by PHP.";
+
+file_put_contents($filename, $content);
+
+echo "TXT file created successfully in current location.";
+?>

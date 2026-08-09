@@ -1,0 +1,63 @@
+{
+    "banner": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Banner",
+        "element": {
+            "images": {
+                "image": {
+                    "size": "1080x720"
+                }
+            },
+            "heading": "text",
+            "modal": true
+        }
+    },
+    "links": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Dashboards Links",
+        "element": {
+            "name": "text",
+            "url": "text",
+            "images": {
+                "image": {
+                    "size": "65x65"
+                }
+            },
+            "modal": true
+        }
+    },
+    "fbr": {
+        "builder": true,
+        "no_selection": true,
+        "name": "About Us / FBR Section",
+        "content": {
+            "heading": "text",
+            "description": "textarea",
+            "images": {
+                "image": {
+                    "size": "800x400"
+                }
+            }
+        }
+    },
+    "tutorial": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Tutorial Section",
+        "content": {
+            "heading": "text",
+            "youtube_link": "text",
+            "description": "text"
+        }
+    },
+    "plan_section": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Plan Section",
+        "content": {
+            "heading": "text"
+        }
+    }
+}

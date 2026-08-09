@@ -1,0 +1,6 @@
+# Don't ignore .env — we need it on the server
+# (InfinityFree has no SSH, so we deploy via git+FTP)
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
