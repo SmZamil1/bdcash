@@ -74,7 +74,7 @@ if ($action == 'requirements') {
             clearstatcache();
         }
 		$perm = substr(sprintf('%o', fileperms($dir)), -4);
-		if ($perm >= '0775') {
+		if ($perm >= '0755') {
 			$passed[] = str_replace("../", "", $dir) . ' is required 0775 permission';
 		} else {
 			$failed[] = str_replace("../", "", $dir) . ' is required 0775 permission. Current Permisiion is ' . $perm;
