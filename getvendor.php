@@ -12,66 +12,93 @@ $chunks = [
 $vendorZip = __DIR__ . '/vendor.zip';
 $coreDir   = __DIR__ . '/core';
 
-echo "<pre style='font-family:monospace;background:#111;color:#0f0;padding:20px;'>";
+function fetchUrl($url) {
+    // Try curl first
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
+        $data = curl_exec($ch);
+        $err  = curl_error($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($data !== false && $code == 200) return $data;
+        return false;
+    }
+    // Try file_get_contents with stream context
+    $ctx = stream_context_create(['http' => [
+        'timeout' => 60,
+        'user_agent' => 'Mozilla/5.0',
+        'follow_location' => true,
+    ]]);
+    return @file_get_contents($url, false, $ctx);
+}
+
+echo "<pre style='font-family:monospace;background:#111;color:#0f0;padding:20px;font-size:12px;'>";
+
+// Check what functions are available
+echo "curl available: " . (function_exists('curl_init') ? 'YES' : 'NO') . "\n";
+echo "allow_url_fopen: " . (ini_get('allow_url_fopen') ? 'YES' : 'NO') . "\n\n";
 flush();
 
-// Step 1: Download & reassemble
 echo "Step 1: Downloading vendor chunks...\n"; flush();
 $out = fopen($vendorZip, 'wb');
 foreach ($chunks as $chunk) {
     $url = $base . $chunk;
     echo "  Fetching $chunk ... "; flush();
-    $data = @file_get_contents($url);
-    if ($data === false) {
-        echo "FAILED\n";
+    $data = fetchUrl($url);
+    if ($data === false || strlen($data) < 1000) {
+        echo "FAILED (got " . strlen($data) . " bytes)\n";
         fclose($out);
-        unlink($vendorZip);
-        die("Error downloading $chunk");
+        @unlink($vendorZip);
+        echo "\nINFO: InfinityFree is blocking outbound HTTP.\n";
+        echo "Trying alternative: download via GitHub API...\n";
+        die();
     }
     fwrite($out, $data);
-    echo strlen($data) . " bytes OK\n"; flush();
+    echo round(strlen($data)/1024) . "KB OK\n"; flush();
 }
 fclose($out);
-echo "vendor.zip assembled: " . round(filesize($vendorZip)/1024/1024, 1) . " MB\n\n"; flush();
+$zipSize = filesize($vendorZip);
+echo "\nvendor.zip assembled: " . round($zipSize/1024/1024,1) . " MB\n\n"; flush();
 
-// Step 2: Extract
-echo "Step 2: Extracting to server...\n"; flush();
+if ($zipSize < 50000000) {
+    echo "WARNING: zip seems too small (" . $zipSize . " bytes). Aborting.\n";
+    unlink($vendorZip);
+    die();
+}
+
+echo "Step 2: Extracting vendor files...\n"; flush();
 $zip = new ZipArchive();
 if ($zip->open($vendorZip) !== true) {
     die("Failed to open vendor.zip");
 }
-
 $total = $zip->numFiles;
-echo "  Total files in zip: $total\n"; flush();
+echo "  Files in zip: $total\n"; flush();
 
 for ($i = 0; $i < $total; $i++) {
     $name = $zip->getNameIndex($i);
-    // Strip leading "core/" — extract relative to $coreDir
     $dest = $coreDir . '/' . substr($name, strlen('core/'));
     $dir  = dirname($dest);
-    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    if (!is_dir($dir)) @mkdir($dir, 0755, true);
     if (substr($name, -1) !== '/') {
         file_put_contents($dest, $zip->getFromIndex($i));
     }
-    if ($i % 2000 === 0) { echo "  Extracted $i / $total files...\n"; flush(); }
+    if ($i % 2000 === 0) { echo "  ... $i / $total\n"; flush(); }
 }
 $zip->close();
-
-// Step 3: Cleanup
 unlink($vendorZip);
-echo "\nStep 3: Cleaned up zip.\n\n";
 
-// Step 4: Verify
 $autoload = $coreDir . '/vendor/autoload.php';
 if (file_exists($autoload)) {
-    echo "✅ vendor/autoload.php EXISTS — vendor installed successfully!\n";
-    echo "✅ Visit <a href='/'>bdcash69.42web.io</a> to open your site.\n";
+    echo "\n✅ SUCCESS! vendor/autoload.php exists.\n";
+    echo "✅ <a href='/'>Click here to open your site!</a>\n";
 } else {
-    echo "❌ autoload.php still missing — something went wrong.\n";
+    echo "\n❌ autoload.php missing after extraction.\n";
 }
-
-// Self-delete
 unlink(__FILE__);
-echo "\nThis script has been deleted for security.\n";
-echo "</pre>";
+echo "\n(Script deleted for security)\n</pre>";
 ?>
