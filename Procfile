@@ -1,0 +1,1 @@
+web: cd core && php artisan config:clear && php -S 0.0.0.0:$PORT -t /app
