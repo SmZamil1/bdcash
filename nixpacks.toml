@@ -2,7 +2,7 @@
 nixPkgs = [
   "php83",
   "php83Extensions.pdo",
-  "php83Extensions.pdo_mysql",
+  "php83Extensions.pdo_mysql", 
   "php83Extensions.mbstring",
   "php83Extensions.xml",
   "php83Extensions.curl",
@@ -14,13 +14,15 @@ nixPkgs = [
   "php83Extensions.fileinfo",
   "php83Extensions.openssl",
   "php83Extensions.intl",
+  "php83Extensions.dom",
+  "php83Extensions.session",
   "composer"
 ]
 
 [phases.build]
 cmds = [
-  "cd core && composer install --no-dev --optimize-autoloader --no-interaction 2>&1 || true",
-  "mkdir -p core/storage/logs core/storage/framework/sessions core/storage/framework/views core/storage/framework/cache core/bootstrap/cache",
+  "cd core && composer install --no-dev --optimize-autoloader --no-interaction",
+  "mkdir -p core/storage/logs core/storage/framework/sessions core/storage/framework/views core/storage/framework/cache/data core/bootstrap/cache",
   "chmod -R 775 core/storage core/bootstrap/cache"
 ]
 
