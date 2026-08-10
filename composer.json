@@ -1,0 +1,11 @@
+{
+  "name": "bdcash/app",
+  "description": "BDCash wrapper",
+  "type": "project",
+  "require": {
+    "php": "^8.3"
+  },
+  "config": {
+    "optimize-autoloader": true
+  }
+}
