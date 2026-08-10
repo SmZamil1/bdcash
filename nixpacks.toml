@@ -1,0 +1,19 @@
+[phases.setup]
+nixPkgs = ["php83", "php83Extensions.pdo", "php83Extensions.pdo_mysql", 
+           "php83Extensions.mbstring", "php83Extensions.xml", 
+           "php83Extensions.curl", "php83Extensions.zip",
+           "php83Extensions.gd", "php83Extensions.bcmath",
+           "php83Extensions.tokenizer", "php83Extensions.ctype",
+           "php83Extensions.fileinfo", "php83Extensions.openssl",
+           "composer"]
+
+[phases.build]
+cmds = [
+  "cd core && composer install --no-dev --optimize-autoloader --no-interaction",
+  "cd core && php artisan config:cache",
+  "cd core && php artisan route:cache",
+  "cd core && php artisan view:cache"
+]
+
+[start]
+cmd = "php -S 0.0.0.0:$PORT -t /app/public_html"
