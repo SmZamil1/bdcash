@@ -1,0 +1,5 @@
+vendor_chunks/
+install/
+.github/
+*.log
+node_modules/
